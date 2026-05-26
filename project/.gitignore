@@ -1,0 +1,25 @@
+# Virtual environment
+venv/
+
+# Face cache
+face_cache.pkl
+
+# Uploaded and result images
+static/uploads/*
+static/results/*
+!static/uploads/.gitkeep
+!static/results/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

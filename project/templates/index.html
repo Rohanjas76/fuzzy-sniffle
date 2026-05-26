@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face Recognition System</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+<!-- ── Particle canvas ── -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ── Grid overlay ── -->
+<div class="grid-overlay"></div>
+
+<!-- ── Header ── -->
+<header class="site-header">
+  <nav class="header-nav">
+    <span class="tag-pill accent">DS Concepts</span>
+    <span id="db-badge" class="tag-pill dim">DB: <b>{{ db_count }}</b> faces</span>
+  </nav>
+</header>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-eyebrow" style="font-size:.65rem;opacity:.7;">
+    <span class="dot"></span>
+    <span>Created by Jashwanth Namachivayam</span>
+  </div>
+  <h1 class="hero-title">
+    <span class="line1">Face Recognition</span>
+    <span class="line2">System</span>
+  </h1>
+  <p class="hero-sub">using <em>Data Science Concepts</em></p>
+  <p class="hero-desc">
+    Upload any photograph to identify a person from the database.
+    The system detects the face, extracts features, and finds the closest match
+    with a confidence score.
+  </p>
+</section>
+
+<!-- ── DS Concept chips ── -->
+<div class="concepts-strip">
+  <div class="concept-chip" style="--d:0s"><span class="chip-num">01</span>Data Collection</div>
+  <div class="concept-chip" style="--d:.08s"><span class="chip-num">02</span>Preprocessing</div>
+  <div class="concept-chip" style="--d:.16s"><span class="chip-num">03</span>Feature Extraction</div>
+  <div class="concept-chip" style="--d:.24s"><span class="chip-num">04</span>Face Encoding</div>
+  <div class="concept-chip" style="--d:.32s"><span class="chip-num">05</span>Pattern Recognition</div>
+  <div class="concept-chip" style="--d:.40s"><span class="chip-num">06</span>ML Matching</div>
+  <div class="concept-chip" style="--d:.48s"><span class="chip-num">07</span>Prediction</div>
+</div>
+
+<!-- ── Main card ── -->
+<main class="main-card">
+
+  <!-- Upload zone -->
+  <div id="drop-zone" class="drop-zone">
+    <div class="drop-inner">
+      <div class="drop-icon">
+        <svg viewBox="0 0 64 64" fill="none">
+          <rect x="8" y="16" width="48" height="36" rx="4" stroke="var(--accent)" stroke-width="2"/>
+          <circle cx="32" cy="34" r="9" stroke="var(--accent2)" stroke-width="2"/>
+          <circle cx="32" cy="34" r="4" fill="var(--accent2)" opacity=".4"/>
+          <circle cx="46" cy="22" r="3" fill="var(--accent)" opacity=".7"/>
+          <path d="M32 8 L32 20" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M26 14 L32 8 L38 14" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="drop-title">Drop image here</p>
+      <p class="drop-sub">or <label for="file-input" class="file-label">browse files</label></p>
+      <p class="drop-hint">PNG · JPG · JPEG · WEBP · BMP — max 16 MB</p>
+    </div>
+    <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.webp,.bmp" hidden />
+  </div>
+
+  <!-- Preview area (hidden until file chosen) -->
+  <div id="preview-area" class="preview-area hidden">
+    <div class="preview-frame">
+      <img id="preview-img" src="" alt="Preview" />
+      <button id="clear-btn" class="clear-btn" title="Remove image">✕</button>
+    </div>
+    <div class="preview-meta">
+      <span id="preview-name" class="meta-name"></span>
+      <span id="preview-size" class="meta-size"></span>
+    </div>
+  </div>
+
+  <!-- Recognize button -->
+  <button id="recognize-btn" class="recognize-btn" disabled>
+    <span class="btn-text">Recognize Face</span>
+    <span class="btn-icon">→</span>
+  </button>
+
+  <!-- Error message -->
+  <div id="error-msg" class="error-msg hidden"></div>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loading-inner">
+      <div class="scanner-ring">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+        <div class="scan-line"></div>
+      </div>
+      <p class="loading-step" id="loading-step">Initialising…</p>
+      <div class="step-dots">
+        <span class="sdot active" data-step="0"></span>
+        <span class="sdot" data-step="1"></span>
+        <span class="sdot" data-step="2"></span>
+        <span class="sdot" data-step="3"></span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Result section (injected by JS) ── -->
+<section id="result-section" class="result-section hidden"></section>
+
+<!-- ── Pipeline infographic ── -->
+<section class="pipeline-section">
+  <h2 class="section-label">Recognition Pipeline</h2>
+  <div class="pipeline">
+    <div class="pipeline-step">
+      <div class="ps-icon">📷</div>
+      <div class="ps-label">Image Input</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-step">
+      <div class="ps-icon">⚙️</div>
+      <div class="ps-label">Preprocessing</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-step">
+      <div class="ps-icon">🔍</div>
+      <div class="ps-label">Face Detection</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-step">
+      <div class="ps-icon">🧬</div>
+      <div class="ps-label">Encoding<br><small>128-d vector</small></div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-step">
+      <div class="ps-icon">📐</div>
+      <div class="ps-label">Distance<br><small>Euclidean</small></div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-step ps-result">
+      <div class="ps-icon">✅</div>
+      <div class="ps-label">Result</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer class="site-footer">
+  <p>Face Recognition System &nbsp;·&nbsp; Data Science Project</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/particles.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
